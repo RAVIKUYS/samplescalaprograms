@@ -3,9 +3,7 @@ package com.learning.scala
 
 import org.apache.spark.sql.SparkSession
 
-
-object structuredTypes {
-  
+object sparkMLExample {
   case class trainClass(
       PassengerId:Float,Survived:Float,Pclass:Float,
       Name:String,Sex:String,Age:Int,SibSp:Int,
@@ -51,12 +49,36 @@ object structuredTypes {
       
     //Displaying 5 records 
     trainDataSet.show(5,false)
-    
     var trainDS  = trainDataSet.select($"Survived",$"Pclass",$"Sex",$"Age",$"Fare",$"Embarked").as[trainSubsetClass]
     
     //Printing first 10 rows of train SubsetClass
     trainDS.show(10,false)
+    
+   
+    //Dropping null values from trainDS
+    println("Count of records before dropping records with null values " + trainDS.count)
+    trainDS.na.drop()
+    println("Count of records after dropping records with null values " + trainDS.count)
+    
+    import org.apache.spark.ml.feature.{StringIndexer,VectorAssembler}
+    val genderIndexer = new StringIndexer().setInputCol("Sex").setOutputCol("Gender")
+    val boardedIndexer = new StringIndexer().setInputCol("Embarked").setOutputCol("Boarded")
+    //Adding the new indexer cols to dataset
+    var indexedDS = genderIndexer.fit(trainDS).transform(trainDS)
+    indexedDS = boardedIndexer.fit(indexedDS).transform(indexedDS)
+    indexedDS.show(20,false)
+    
+    //Dropping unwanted columns
+    indexedDS = indexedDS.drop("Sex")
+    indexedDS = indexedDS.drop("Embarked")
+    indexedDS.show(20,false)
+    indexedDS.na.drop()
+    
+    val required_features = Array("Pclass","Age","Fare","Gender","Boarded")
+    val vectorAssembler = new VectorAssembler().setInputCols(required_features).setOutputCol("features").setHandleInvalid("skip")
     //Stopping the spark context
+    val transformedDS = vectorAssembler.transform(indexedDS)
+    transformedDS.show(20,false)
     sparkSession.stop() 
   }
 }
