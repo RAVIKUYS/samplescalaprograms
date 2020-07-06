@@ -249,5 +249,6 @@
 	<classpathentry kind="lib" path="/usr/local/spark3/jars/algebra_2.12-2.0.0-M2.jar"/>
 	<classpathentry kind="lib" path="/usr/local/spark3/jars/aircompressor-0.10.jar"/>
 	<classpathentry kind="lib" path="/usr/local/spark3/jars/activation-1.1.1.jar"/>
+	<classpathentry kind="lib" path="/usr/local/elasticsearch/elasticsearch-spark-20_2.10-7.4.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

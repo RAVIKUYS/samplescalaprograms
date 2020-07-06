@@ -21,7 +21,10 @@ object sparkMLExample {
     
     println("Creating spark context")
     //Creating a spark context and sql context
-    val sparkSession = SparkSession.builder().master("local[*]").appName("structured types example").getOrCreate()
+    val sparkSession = SparkSession.builder().master("local[*]")
+        .appName("Spark ML Example")
+        .enableHiveSupport()
+        .getOrCreate()
     val sqlcont = sparkSession.sqlContext
     
     
