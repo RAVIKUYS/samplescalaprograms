@@ -74,11 +74,51 @@ object sparkMLExample {
     indexedDS.show(20,false)
     indexedDS.na.drop()
     
+    //Creating a vector assembler to store all features except survived in a separate column.
+    //This is the most important step in Machine Learning
     val required_features = Array("Pclass","Age","Fare","Gender","Boarded")
     val vectorAssembler = new VectorAssembler().setInputCols(required_features).setOutputCol("features").setHandleInvalid("skip")
     //Stopping the spark context
     val transformedDS = vectorAssembler.transform(indexedDS)
     transformedDS.show(20,false)
+    
+    
+    //Splitting dataset into 2 parts before applying estimator
+    val divData = transformedDS.randomSplit(Array(0.8,0.2), 13L)
+    val trainingDataset = divData(0)
+    val testingDataset = divData(1)
+    
+    import org.apache.spark.ml.classification.RandomForestClassifier
+    val rf = new RandomForestClassifier()
+      .setFeaturesCol(vectorAssembler.getOutputCol)
+      .setLabelCol("Survived")
+      .setNumTrees(20)
+      .setMaxDepth(5)
+      .setMaxBins(32)
+      .setMinInstancesPerNode(1)
+      .setMinInfoGain(0.0)
+      .setCacheNodeIds(false)
+      .setCheckpointInterval(10)
+    
+    val model = rf.fit(trainingDataset)
+    val predictions = model.transform(testingDataset)
+    
+    //Evaluating the model for accuracy
+    import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
+    
+    
+    
+    // Select (prediction, true label) and compute test error
+    val accuracyEval = new MulticlassClassificationEvaluator()
+      .setLabelCol("Survived")
+      .setPredictionCol("prediction")
+      .setMetricName("accuracy")
+    
+    
+    val accuracyCalc = accuracyEval.evaluate(predictions)
+    print("Test Accuracy = " + accuracyCalc)
+      
+    //Stopping the spark session
     sparkSession.stop() 
   }
 }
