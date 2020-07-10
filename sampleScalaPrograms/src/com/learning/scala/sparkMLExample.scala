@@ -33,7 +33,7 @@ object sparkMLExample {
             StructField("PassengerId", FloatType, true),
             StructField("Survived", FloatType, true),
             StructField("Pclass", FloatType, true),
-            StructField("Name", FloatType, true),
+            StructField("Name", StringType, true),
             StructField("Sex", StringType,true),
             StructField("Age", IntegerType, true),
             StructField("SibSp", IntegerType, true),
